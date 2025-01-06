@@ -32,9 +32,9 @@ fun SoundVisualizer(modifier: Modifier = Modifier) {
             if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
                 == PackageManager.PERMISSION_GRANTED
             ) {
-                val sampleRate = 48000 // Используем 44.1kHz для улучшенной производительности
-                val channelConfig = AudioFormat.CHANNEL_IN_STEREO // Стерео для качественного звука
-                val encoding = AudioFormat.ENCODING_PCM_16BIT // Стандартная кодировка
+                val sampleRate = 48000
+                val channelConfig = AudioFormat.CHANNEL_IN_STEREO
+                val encoding = AudioFormat.ENCODING_PCM_16BIT
                 val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, encoding)
 
                 val audioRecord = AudioRecord(
@@ -69,8 +69,8 @@ fun SoundVisualizer(modifier: Modifier = Modifier) {
 
     Canvas(modifier = modifier.fillMaxSize()) {
         val amplitudes = audioData.value
-        val isPortrait = size.height > size.width  // Определяем ориентацию устройства
-        val lineCount = if (isPortrait) 100 else 200  // 100 для вертикального и 200 для горизонтального режима
+        val isPortrait = size.height > size.width
+        val lineCount = if (isPortrait) 100 else 200
 
         if (amplitudes.isNotEmpty()) {
             val width = size.width
@@ -84,7 +84,8 @@ fun SoundVisualizer(modifier: Modifier = Modifier) {
             val interpolatedAmplitudes = List(lineCount) { index ->
                 val ratio = index.toFloat() / lineCount
                 val currentAmplitude = amplitudes.getOrNull((ratio * amplitudes.size).toInt()) ?: 0f
-                val previousAmplitude = previousAmplitudes.value.getOrNull(index) ?: currentAmplitude
+                val previousAmplitude =
+                    previousAmplitudes.value.getOrNull(index) ?: currentAmplitude
 
                 // Плавное изменение (интерполяция) между предыдущей и текущей амплитудой
                 val interpolatedAmplitude = leap(previousAmplitude, currentAmplitude, 0.1f)
