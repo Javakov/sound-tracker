@@ -50,13 +50,11 @@ class MainActivity : ComponentActivity() {
                 Box(modifier = Modifier.fillMaxSize()) {
                     BouncingBallView(modifier = Modifier.fillMaxSize())
 
-                    Column(modifier = Modifier.padding(16.dp)) {
+                    Column(modifier = Modifier.padding(10.dp)) {
                         SoundVisualizer(modifier = Modifier.weight(1f))
                     }
                 }
             }
         }
     }
-
 }
-

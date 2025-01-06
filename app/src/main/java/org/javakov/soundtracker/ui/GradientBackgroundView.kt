@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 fun GradientBackground(modifier: Modifier = Modifier) {
     val transition = rememberInfiniteTransition(label = "")
 
-    // Анимация для изменения углов градиента
     val startX by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1f,
@@ -41,23 +40,21 @@ fun GradientBackground(modifier: Modifier = Modifier) {
                 durationMillis = 20000, // Длительность анимации
                 easing = FastOutSlowInEasing
             ),
-            repeatMode = RepeatMode.Reverse // Реверсивный повтор
+            repeatMode = RepeatMode.Reverse
         ), label = ""
     )
 
-    // Углы для анимированного градиента
     val gradient = Brush.linearGradient(
         colors = listOf(
-            Color(0xFF345B82), // Темный синий
-            Color(0xFF15395E), // Светло-синий
-            Color(0xFF1D2A38)  // Тёмно-серый
+            Color(0xFF345B82),
+            Color(0xFF15395E),
+            Color(0xFF1D2A38)
         ),
         start = Offset(0f, 0f),  // Начальный угол
         end = Offset(startX * 1000f, startY * 1000f)  // Изменение направления градиента
     )
 
     Canvas(modifier = modifier.fillMaxSize()) {
-        // Отрисовываем анимированный градиент
         drawRect(brush = gradient)
     }
 }

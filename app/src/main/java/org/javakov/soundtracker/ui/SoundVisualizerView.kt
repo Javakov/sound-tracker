@@ -5,10 +5,18 @@ import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,6 +34,38 @@ fun SoundVisualizer(modifier: Modifier = Modifier) {
     val previousAmplitudes = remember { mutableStateOf(emptyList<Float>()) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    val colors = listOf(
+        Color.Red,
+        Color(255, 127, 0),
+        Color.Yellow,
+        Color.Green,
+        Color.Cyan,
+        Color.Blue,
+        Color.Magenta
+    )
+
+    val transition = rememberInfiniteTransition(label = "")
+    val colorValue by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 10000,
+                easing = LinearEasing
+            ),
+            repeatMode = RepeatMode.Restart
+        ), label = ""
+    )
+
+    val colorIndex = (colorValue * colors.size).toInt() % colors.size
+    val currentColor by animateColorAsState(
+        targetValue = colors[colorIndex],
+        animationSpec = tween(
+            durationMillis = 2000,
+            easing = LinearEasing
+        ), label = ""
+    )
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
@@ -77,29 +117,26 @@ fun SoundVisualizer(modifier: Modifier = Modifier) {
             val height = size.height
             val middle = height / 2
 
-            // Количество линий для отображения
             val step = width / lineCount
 
-            // Интерполяция между предыдущими и новыми значениями амплитуды
             val interpolatedAmplitudes = List(lineCount) { index ->
                 val ratio = index.toFloat() / lineCount
                 val currentAmplitude = amplitudes.getOrNull((ratio * amplitudes.size).toInt()) ?: 0f
                 val previousAmplitude =
                     previousAmplitudes.value.getOrNull(index) ?: currentAmplitude
 
-                // Плавное изменение (интерполяция) между предыдущей и текущей амплитудой
                 val interpolatedAmplitude = leap(previousAmplitude, currentAmplitude, 0.1f)
                 interpolatedAmplitude
             }
 
-            // Обновляем предыдущие амплитуды для следующей итерации
             previousAmplitudes.value = interpolatedAmplitudes
 
             interpolatedAmplitudes.forEachIndexed { index, amplitude ->
                 val x = index * step
                 val y = middle + amplitude * middle
+
                 drawLine(
-                    color = Color.Green,
+                    color = currentColor,
                     start = Offset(x, middle),
                     end = Offset(x, y),
                     strokeWidth = 4f
